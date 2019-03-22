@@ -11,9 +11,13 @@
     "dev": "nodemon ./server.js"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "mongoose": "^5.4.19",
     "serve-static": "^1.13.2",
-    "vue": "^2.6.6"
+    "vue": "^2.6.6",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",
