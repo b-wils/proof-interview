@@ -6,10 +6,9 @@ module.exports = {
       // mutate for development...
         return {
         	devServer: {
-        		port: 8080,
         	proxy: {
 	        '/api': {
-	            target: 'http://localhost:3000',
+	            target: 'http://localhost:' + process.env.DEV_API_PORT,
 	            secure: false,
 	            changeOrigin: true
 	        }
