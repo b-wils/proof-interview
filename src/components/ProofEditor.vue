@@ -13,10 +13,15 @@ export default {
   props: {
     msg: String
   },
+  data() {
+  	return {
+  		files: null
+  	}
+  },
   mounted() {
   	    axios
       .get('/api/files')
-      .then(response => ())
+      .then(response => (this.files = response.data))
   }
   
 }
