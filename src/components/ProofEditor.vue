@@ -14,10 +14,9 @@ export default {
     msg: String
   },
   mounted() {
-  	console.log('mounted!!!')
   	    axios
       .get('/api/files')
-      .then(response => (console.log (response)))
+      .then(response => ())
   }
   
 }
