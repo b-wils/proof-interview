@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<h1> Proof Editor! </h1>
+    <div>
+        <h1> Proof Editor! </h1>
   </div>
 </template>
 
@@ -14,12 +14,12 @@ export default {
     msg: String
   },
   data() {
-  	return {
-  		files: null
-  	}
+    return {
+        files: null
+  }
   },
   mounted() {
-  	    axios
+        axios
       .get('/api/files')
       .then(response => (this.files = response.data))
   }
