@@ -3,18 +3,18 @@ const express = require('express');
 const  bodyParser = require('body-parser');
 const serveStatic = require("serve-static")
 const path = require('path');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
 
 // Bootstrap models
-require('./server/db/file')
+require('./db/file')
 
 // Route handlers
-const createFile = require('./server/routes/createFile')
-const listFiles = require('./server/routes/listFiles')
-const findFileBySlug = require ('./server/routes/findFileBySlug')
-const showFile = require ('./server/routes/showFile')
-const updateFile = require('./server/routes/updateFile')
-const deleteFile = require('./server/routes/deleteFile')
+const createFile = require('./routes/createFile')
+const listFiles = require('./routes/listFiles')
+const findFileBySlug = require ('./routes/findFileBySlug')
+const showFile = require ('./routes/showFile')
+const updateFile = require('./routes/updateFile')
+const deleteFile = require('./routes/deleteFile')
 
 // configure db
 let uri = process.env.MONGODB_URI;
