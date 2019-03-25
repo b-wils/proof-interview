@@ -1,6 +1,23 @@
 <template>
     <div>
         <h1> Proof Editor! </h1>
+
+        <section v-if="errorMessage">
+          {{errorMessage}}
+        </section>
+
+        <section v-else-if="loading">
+          Loading....
+        </section>
+
+        <section v-else>
+          <ul>
+            <li v-for="file in files">
+              {{file.name}}
+            </li>
+          </ul>
+          
+        </section>
   </div>
 </template>
 
@@ -15,13 +32,23 @@ export default {
   },
   data() {
     return {
-        files: null
+        files: null,
+        loading: true,
+        errorMessage: null
   }
   },
   mounted() {
         axios
       .get('/api/files')
-      .then(response => (this.files = response.data))
+      .then(response => 
+        {
+          this.files = response.data
+          this.loading = false;
+        })
+      .catch(error=>{
+        console.log(error)
+        this.errorMessage = error
+      })
   }
   
 }
