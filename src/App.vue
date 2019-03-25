@@ -1,18 +1,13 @@
 <template>
   <div id="app">
-    <ProofEditor msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import ProofEditor from './components/ProofEditor.vue'
 
 export default {
-  name: 'app',
-  components: {
-    ProofEditor
-  }
+  name: 'app'
 }
 </script>
 

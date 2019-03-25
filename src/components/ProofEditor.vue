@@ -13,10 +13,11 @@
         <section v-else>
           <ul>
             <li v-for="file in files">
-              {{file.name}}
+                <router-link :to="'/' + file.slug"> {{file.name}} </router-link>
             </li>
           </ul>
           
+          {{fileContents}}
         </section>
   </div>
 </template>
@@ -34,9 +35,12 @@ export default {
     return {
         files: null,
         loading: true,
-        errorMessage: null
+        errorMessage: null,
+        fileMap: {},
+        fileContents: ""
   }
   },
+  props: ['fileSlug'],
   mounted() {
         axios
       .get('/api/files')
@@ -44,11 +48,22 @@ export default {
         {
           this.files = response.data
           this.loading = false;
+
+
+          this.fileMap = this.files.reduce((map, item) => {
+            map[item.slug] = item;
+            return map;
+          }, {})
         })
       .catch(error=>{
         console.log(error)
         this.errorMessage = error
       })
+  },
+  watch: {
+    '$route' (to, from) {
+      this.fileContents = this.fileMap[to.params.fileSlug].contents
+    }
   }
   
 }
