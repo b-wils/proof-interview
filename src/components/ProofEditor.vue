@@ -17,8 +17,11 @@
             </li>
           </ul>
 
+          <input v-model="newFileName" placeholder="New File Name" />
+          <button v-on:click="createNewFile()"> New </button>
+
           <button v-on:click="updateFileContent()"> Save </button>
-          <textarea v-model="fileContents" placeholder="add multiple lines"></textarea>
+          <textarea v-model="fileContents" placeholder="Enter Text Here"></textarea>
         </section>
   </div>
 </template>
@@ -38,7 +41,8 @@ export default {
         loading: true,
         errorMessage: null,
         fileMap: {},
-        fileContents: ""
+        fileContents: "",
+        newFileName: ""
   }
   },
   props: ['fileSlug'],
@@ -88,6 +92,23 @@ export default {
         // TODO we should probably update our file list as well
         this.fileMap[this.fileSlug].contents=this.fileContents;
       })
+      .catch(function (error) {
+        console.log(error);
+        this.errorMessage = error;        
+      });
+    },
+    createNewFile: function() {
+      axios.post('/api/files', {name:this.newFileName}).then(response => {
+        
+        // TODO files list is unsorted
+        var newFile = response.data;
+
+        this.files.push(newFile);
+        this.fileMap[newFile.slug] = newFile;
+        this.newFileName = "";
+        this.fileContents = "";
+        this.$router.push('/' + newFile.slug)
+      }) 
       .catch(function (error) {
         console.log(error);
         this.errorMessage = error;        
