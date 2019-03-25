@@ -16,8 +16,9 @@
                 <router-link :to="'/' + file.slug"> {{file.name}} </router-link>
             </li>
           </ul>
-          
-          {{fileContents}}
+
+          <button v-on:click="updateFileContent()"> Save </button>
+          <textarea v-model="fileContents" placeholder="add multiple lines"></textarea>
         </section>
   </div>
 </template>
@@ -54,6 +55,10 @@ export default {
             map[item.slug] = item;
             return map;
           }, {})
+
+          if (this.fileSlug) {
+            this.setFileContent();
+          }
         })
       .catch(error=>{
         console.log(error)
@@ -62,7 +67,31 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      this.fileContents = this.fileMap[to.params.fileSlug].contents
+      this.setFileContent()
+    }
+  },
+  methods: {
+    setFileContent: function() {
+
+      if (this.fileMap[this.fileSlug]) {
+        this.fileContents = this.fileMap[this.fileSlug].contents  
+      } else {
+        this.errorMessage = "Could not find file " + this.fileSlug
+      }
+
+      
+    },
+    updateFileContent: function() {
+      axios.put('/api/files/' + this.fileSlug, {contents:this.fileContents}).then(response => {
+        // Update our internal state to match
+        // TODO vuex would be a nice addition here
+        // TODO we should probably update our file list as well
+        this.fileMap[this.fileSlug].contents=this.fileContents;
+      })
+      .catch(function (error) {
+        console.log(error);
+        this.errorMessage = error;        
+      });
     }
   }
   
