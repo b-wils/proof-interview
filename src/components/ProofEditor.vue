@@ -63,7 +63,7 @@
     </v-toolbar>
 
     <v-content full-height>
-        <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File" v-on:keyup="onKeyUp"></textarea>
+        <textarea style="height: 100%;width: 100%; resize:none" v-model="fileContents" placeholder="Empty File" v-on:keyup="onKeyUp"></textarea>
     </v-content>
 
     <v-footer color="indigo" app>
@@ -169,9 +169,9 @@ export default {
       this.newFileDialog = false;
       axios.post('/api/files', {name:this.newFileName, contents:this.fileContents}).then(response => {
         
-        // TODO files list is unsorted
         var newFile = response.data;
 
+        // TODO files list is unsorted
         this.files.push(newFile);
         this.fileMap[newFile.slug] = newFile;
         this.fileName = this.newFileName;
