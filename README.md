@@ -26,7 +26,7 @@ npm run dev
 npm run serve
 ```
 
-## Improvements
+## Future Improvements
 
 * Add vuex for state management
 * Separate into smaller components
