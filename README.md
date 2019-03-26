@@ -13,7 +13,7 @@ npm install
 copy .env.sample .env
 ```
 
-Update .env with your local files
+Update .env with your local settings
 
 ### Compile and run api server/built vue files
 ```
