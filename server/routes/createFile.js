@@ -5,6 +5,11 @@ module.exports = function(req, res) {
 
     var document = new File(req.body);
 
+    if (!document.name) {
+        res.status(403).send({message:"File name is required"})
+        return;
+    }
+
     document.slug = encodeURIComponent(document.name)
 
     File.findOne({slug:document.slug}, (err, existingDoc) => {

@@ -5,7 +5,6 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
 import ProofEditor from './components/ProofEditor.vue'
-import FileEditor from './components/FileEditor.vue'
 
 Vue.config.productionTip = false
 
