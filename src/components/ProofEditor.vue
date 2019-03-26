@@ -1,5 +1,6 @@
 <template>
   <v-app>
+
      <v-dialog v-model="newFileDialog" persistent max-width="600px">
        <v-card>
         <v-card-title>
@@ -39,35 +40,36 @@
       </v-card>
      </v-dialog>
 
-      <v-navigation-drawer
-    v-model="drawer"
-    fixed
-    app
-  >
-    <v-list dense>
-      <v-list-tile to="/">
-        Create New File
-      </v-list-tile>
-      <v-list-tile v-for="file in files" :key="file.id" :to="file.slug">
-        {{file.name}}
-      </v-list-tile>
-    </v-list>
-  </v-navigation-drawer>
+    <v-navigation-drawer
+        v-model="drawer"
+        fixed
+        app
+      >
+      <v-list dense>
+        <v-list-tile to="/">
+          Create New File
+        </v-list-tile>
+        <v-list-tile v-for="file in files" :key="file.id" :to="file.slug">
+          {{file.name}}
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
 
     <v-toolbar color="indigo" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Proof File Editor</v-toolbar-title>
+      <v-toolbar-title>Proof File Editor - {{fileName}}</v-toolbar-title>
                       <v-btn v-on:click="updateFileContent()" :disabled="!fileChanged"> Save </v-btn>
                       <v-btn v-on:click="deleteFileDialog = true" :disabled="!fileSlug" color="error"> Delete </v-btn>
     </v-toolbar>
-    <v-content full-height>
 
+    <v-content full-height>
         <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File" v-on:keyup="onKeyUp"></textarea>
-       
     </v-content>
+
     <v-footer color="indigo" app>
       <span class="white--text">&copy; 2019 - Brandon Wilson</span>
     </v-footer>
+
   </v-app>
     
 </template>
@@ -91,7 +93,8 @@ export default {
         newFileDialog: false,
         deleteFileDialog: false,
         errorDialog: false,
-        fileChanged: false
+        fileChanged: false,
+        fileName: ""
   }
   },
   props: ['fileSlug'],
@@ -127,12 +130,14 @@ export default {
       if (this.fileMap[encodeURIComponent(this.fileSlug)]) {
         this.fileContents = this.fileMap[encodeURIComponent(this.fileSlug)].contents
         this.fileChanged = false;
+        this.fileName = this.fileMap[encodeURIComponent(this.fileSlug)].name
       } else if (!this.fileSlug) {
         this.fileContents = "";
         this.fileChanged = false;
+        this.fileName = "untitled"
       } else {
-        console.log('no file' + this.fileSlug)
-        this.errorMessage = "Could not find file " + this.fileSlug
+        this.setErrorMessage("Could not find file " + this.fileSlug)
+        this.$router.push('/')
       }
 
       
@@ -169,7 +174,7 @@ export default {
 
         this.files.push(newFile);
         this.fileMap[newFile.slug] = newFile;
-
+        this.fileName = this.newFileName;
         this.newFileName = "";
         this.fileContents = "";
         this.$router.push('/' + newFile.slug)
@@ -206,6 +211,7 @@ export default {
       this.errorMessage = error;
     },
     onKeyUp: function() {
+      // TODO primitive way to see if the current file has been changed
       this.fileChanged = true;
     }
   }
