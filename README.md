@@ -34,3 +34,4 @@ npm run serve
 * Support file renames
 * Prompt to save unsaved files
 * Improve layout/styling
+* Automated testing
