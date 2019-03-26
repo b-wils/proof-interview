@@ -3,7 +3,7 @@ var File = mongoose.model('File');
 
 module.exports = function(req, res, next, slug) {
 
-    File.findOne({slug:slug}, (err, document) => {
+    File.findOne({slug:encodeURIComponent(slug)}, (err, document) => {
     	if (err) {
     		console.log('error looking for file by slug')
     		res.status(500).send({error: err});
