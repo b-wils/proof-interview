@@ -1,29 +1,50 @@
 <template>
-    <div>
-        <h1> Proof Editor! </h1>
-
-        <section v-if="errorMessage">
-          {{errorMessage}}
-        </section>
-
-        <section v-else-if="loading">
-          Loading....
-        </section>
-
-        <section v-else>
-          <ul>
-            <li v-for="file in files">
-                <router-link :to="'/' + file.slug"> {{file.name}} </router-link>
-            </li>
-          </ul>
-
+  <v-app>
+     <v-dialog v-model="newFileDialog" persistent max-width="600px">
+       <v-card>
+        <v-card-title>
+          <span class="headline">Enter new file name:</span>
           <input v-model="newFileName" placeholder="New File Name" />
-          <button v-on:click="createNewFile()"> New </button>
+          <v-card-actions>
+            <v-btn @click="createNewFile()"> Save </v-btn>
+            <v-btn @click="newFileDialog = false"> Cancel </v-btn>
+            
+          </v-card-actions>
+        </v-card-title>
+      </v-card>
+     </v-dialog>
 
-          <button v-on:click="updateFileContent()"> Save </button>
-          <textarea v-model="fileContents" placeholder="Enter Text Here"></textarea>
-        </section>
-  </div>
+      <v-navigation-drawer
+    v-model="drawer"
+    fixed
+    app
+  >
+    <v-list dense>
+      <v-list-tile to="/">
+        Create New File
+      </v-list-tile>
+      <v-list-tile v-for="file in files" :key="file.id" :to="file.slug">
+        {{file.name}}
+      </v-list-tile>
+    </v-list>
+  </v-navigation-drawer>
+
+    <v-toolbar color="indigo" dark fixed app>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Proof File Editor</v-toolbar-title>
+                      <v-btn v-on:click="updateFileContent()"> Save </v-btn>
+    </v-toolbar>
+    <v-content full-height>
+
+        <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File"></textarea>
+       
+
+    </v-content>
+    <v-footer color="indigo" app>
+      <span class="white--text">&copy; 2019 - Brandon Wilson</span>
+    </v-footer>
+  </v-app>
+    
 </template>
 
 <script>
@@ -42,7 +63,9 @@ export default {
         errorMessage: null,
         fileMap: {},
         fileContents: "",
-        newFileName: ""
+        newFileName: "",
+        drawer: null,
+        newFileDialog: false
   }
   },
   props: ['fileSlug'],
@@ -60,9 +83,7 @@ export default {
             return map;
           }, {})
 
-          if (this.fileSlug) {
-            this.setFileContent();
-          }
+          this.setFileContent();
         })
       .catch(error=>{
         console.log(error)
@@ -77,15 +98,23 @@ export default {
   methods: {
     setFileContent: function() {
 
-      if (this.fileMap[this.fileSlug]) {
-        this.fileContents = this.fileMap[this.fileSlug].contents  
+      if (this.fileMap[encodeURIComponent(this.fileSlug)]) {
+        this.fileContents = this.fileMap[encodeURIComponent(this.fileSlug)].contents  
+      } else if (!this.fileSlug) {
+        this.fileContents = "";
       } else {
+        console.log('no file' + this.fileSlug)
         this.errorMessage = "Could not find file " + this.fileSlug
       }
 
       
     },
     updateFileContent: function() {
+
+      if (!this.fileSlug) {
+        this.newFileDialog = true
+        return;
+      }
       axios.put('/api/files/' + this.fileSlug, {contents:this.fileContents}).then(response => {
         // Update our internal state to match
         // TODO vuex would be a nice addition here
@@ -98,15 +127,17 @@ export default {
       });
     },
     createNewFile: function() {
-      axios.post('/api/files', {name:this.newFileName}).then(response => {
+      axios.post('/api/files', {name:this.newFileName, contents:this.fileContents}).then(response => {
         
         // TODO files list is unsorted
         var newFile = response.data;
 
         this.files.push(newFile);
         this.fileMap[newFile.slug] = newFile;
+
         this.newFileName = "";
         this.fileContents = "";
+        this.newFileDialog = "";
         this.$router.push('/' + newFile.slug)
       }) 
       .catch(function (error) {
