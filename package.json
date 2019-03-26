@@ -19,6 +19,7 @@
     "lodash.get": "^4.4.2",
     "mongoose": "^5.4.19",
     "serve-static": "^1.13.2",
+    "underscore": "^1.9.1",
     "vue": "^2.6.6",
     "vue-router": "^3.0.2",
     "vuetify": "^1.5.7",
