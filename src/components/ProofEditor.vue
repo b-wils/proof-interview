@@ -27,6 +27,18 @@
       </v-card>
      </v-dialog>
 
+     <v-dialog v-model="errorDialog" persistent max-width="600px">
+       <v-card>
+        <v-card-title>
+          <span class="headline">An Error occured:</span> {{this.errorMessage}}
+          <v-card-actions>
+            <v-btn @click="errorDialog = false"> Ok </v-btn>
+            
+          </v-card-actions>
+        </v-card-title>
+      </v-card>
+     </v-dialog>
+
       <v-navigation-drawer
     v-model="drawer"
     fixed
@@ -63,6 +75,7 @@
 <script>
 
 import axios from 'axios'
+import get from 'lodash.get'
 
 export default {
   name: 'ProofEditor',
@@ -79,7 +92,8 @@ export default {
         newFileName: "",
         drawer: null,
         newFileDialog: false,
-        deleteFileDialog: false
+        deleteFileDialog: false,
+        errorDialog: false
   }
   },
   props: ['fileSlug'],
@@ -135,9 +149,14 @@ export default {
         // TODO we should probably update our file list as well
         this.fileMap[this.fileSlug].contents=this.fileContents;
       })
-      .catch(function (error) {
-        console.log(error);
-        this.errorMessage = error;        
+      .catch((error) => {
+        if (error.response.data.message) {
+          this.setErrorMessage(error.response.data.message)
+        } else {
+          console.log(error)
+          this.setErrorMessage('Unknown error')
+        }
+        
       });
     },
     createNewFile: function() {
@@ -154,9 +173,14 @@ export default {
         this.fileContents = "";
         this.$router.push('/' + newFile.slug)
       }) 
-      .catch(function (error) {
-        console.log(error);
-        this.errorMessage = error;        
+      .catch((error) => {
+        if (get(error, "response.data.message")) {
+          this.setErrorMessage(error.response.data.message)
+        } else {
+          console.log(error)
+          this.setErrorMessage('Unknown error')
+        }
+        
       });
     },
     deleteFile: function() {
@@ -166,10 +190,18 @@ export default {
         this.files = this.files.filter((file) => file.slug !== this.fileSlug)
         this.$router.push('/')
       })
-      .catch(function (error) {
-        console.log(error);
-        this.errorMessage = error;        
+      .catch((error) => {
+        if (error.response.data.message) {
+          this.setErrorMessage(error.response.data.message)
+        } else {
+          this.setErrorMessage('Unknown error')
+        }
+        
       });
+    },
+    setErrorMessage: function(error) {
+      this.errorDialog = true;
+      this.errorMessage = error;
     }
   }
   
