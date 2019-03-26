@@ -14,6 +14,19 @@
       </v-card>
      </v-dialog>
 
+     <v-dialog v-model="deleteFileDialog" persistent max-width="600px">
+       <v-card>
+        <v-card-title>
+          <span class="headline">Are you sure you want to delete file?</span>
+          <v-card-actions>
+            <v-btn @click="deleteFile()" color="error"> Delete </v-btn>
+            <v-btn @click="deleteFileDialog = false"> Cancel </v-btn>
+            
+          </v-card-actions>
+        </v-card-title>
+      </v-card>
+     </v-dialog>
+
       <v-navigation-drawer
     v-model="drawer"
     fixed
@@ -33,12 +46,12 @@
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Proof File Editor</v-toolbar-title>
                       <v-btn v-on:click="updateFileContent()"> Save </v-btn>
+                      <v-btn v-on:click="deleteFileDialog = true" :disabled="!fileSlug" color="error"> Delete </v-btn>
     </v-toolbar>
     <v-content full-height>
 
         <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File"></textarea>
        
-
     </v-content>
     <v-footer color="indigo" app>
       <span class="white--text">&copy; 2019 - Brandon Wilson</span>
@@ -65,7 +78,8 @@ export default {
         fileContents: "",
         newFileName: "",
         drawer: null,
-        newFileDialog: false
+        newFileDialog: false,
+        deleteFileDialog: false
   }
   },
   props: ['fileSlug'],
@@ -127,6 +141,7 @@ export default {
       });
     },
     createNewFile: function() {
+      this.newFileDialog = false;
       axios.post('/api/files', {name:this.newFileName, contents:this.fileContents}).then(response => {
         
         // TODO files list is unsorted
@@ -137,9 +152,20 @@ export default {
 
         this.newFileName = "";
         this.fileContents = "";
-        this.newFileDialog = "";
         this.$router.push('/' + newFile.slug)
       }) 
+      .catch(function (error) {
+        console.log(error);
+        this.errorMessage = error;        
+      });
+    },
+    deleteFile: function() {
+      this.deleteFileDialog = false;
+      axios.delete('/api/files/' + this.fileSlug).then(response => {
+        delete this.fileMap[this.fileSlug];
+        this.files = this.files.filter((file) => file.slug !== this.fileSlug)
+        this.$router.push('/')
+      })
       .catch(function (error) {
         console.log(error);
         this.errorMessage = error;        
