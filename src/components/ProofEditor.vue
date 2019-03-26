@@ -57,12 +57,12 @@
     <v-toolbar color="indigo" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Proof File Editor</v-toolbar-title>
-                      <v-btn v-on:click="updateFileContent()"> Save </v-btn>
+                      <v-btn v-on:click="updateFileContent()" :disabled="!fileChanged"> Save </v-btn>
                       <v-btn v-on:click="deleteFileDialog = true" :disabled="!fileSlug" color="error"> Delete </v-btn>
     </v-toolbar>
     <v-content full-height>
 
-        <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File"></textarea>
+        <textarea style="height: 100%;width: 100%;" v-model="fileContents" placeholder="Empty File" v-on:keyup="onKeyUp"></textarea>
        
     </v-content>
     <v-footer color="indigo" app>
@@ -79,9 +79,6 @@ import get from 'lodash.get'
 
 export default {
   name: 'ProofEditor',
-  props: {
-    msg: String
-  },
   data() {
     return {
         files: null,
@@ -93,7 +90,8 @@ export default {
         drawer: null,
         newFileDialog: false,
         deleteFileDialog: false,
-        errorDialog: false
+        errorDialog: false,
+        fileChanged: false
   }
   },
   props: ['fileSlug'],
@@ -127,9 +125,11 @@ export default {
     setFileContent: function() {
 
       if (this.fileMap[encodeURIComponent(this.fileSlug)]) {
-        this.fileContents = this.fileMap[encodeURIComponent(this.fileSlug)].contents  
+        this.fileContents = this.fileMap[encodeURIComponent(this.fileSlug)].contents
+        this.fileChanged = false;
       } else if (!this.fileSlug) {
         this.fileContents = "";
+        this.fileChanged = false;
       } else {
         console.log('no file' + this.fileSlug)
         this.errorMessage = "Could not find file " + this.fileSlug
@@ -147,6 +147,7 @@ export default {
         // Update our internal state to match
         // TODO vuex would be a nice addition here
         // TODO we should probably update our file list as well
+        this.fileChanged = false;
         this.fileMap[this.fileSlug].contents=this.fileContents;
       })
       .catch((error) => {
@@ -172,6 +173,7 @@ export default {
         this.newFileName = "";
         this.fileContents = "";
         this.$router.push('/' + newFile.slug)
+        this.fileChanged = false;
       }) 
       .catch((error) => {
         if (get(error, "response.data.message")) {
@@ -202,6 +204,9 @@ export default {
     setErrorMessage: function(error) {
       this.errorDialog = true;
       this.errorMessage = error;
+    },
+    onKeyUp: function() {
+      this.fileChanged = true;
     }
   }
   
