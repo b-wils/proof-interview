@@ -193,8 +193,8 @@ export default {
     deleteFile: function() {
       this.deleteFileDialog = false;
       axios.delete('/api/files/' + this.fileSlug).then(response => {
-        delete this.fileMap[this.fileSlug];
-        this.files = this.files.filter((file) => file.slug !== this.fileSlug)
+        delete this.fileMap[encodeURIComponent(this.fileSlug)];
+        this.files = this.files.filter((file) => file.slug !== encodeURIComponent(this.fileSlug))
         this.$router.push('/')
       })
       .catch((error) => {
